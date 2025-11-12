@@ -14,11 +14,10 @@ variables:
 steps:
 - checkout: self
 
-# AzureCLI@2 automatically logs in with the service connection you specify.
 - task: AzureCLI@2
   displayName: 'Upload static website to $web (RBAC, no keys)'
   inputs:
-    azureSubscription: 'sc-azure-portfolio'   # your service connection
+    azureSubscription: 'sc-azure-portfolio'
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
