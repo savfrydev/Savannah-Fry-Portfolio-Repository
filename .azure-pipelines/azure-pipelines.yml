@@ -3,7 +3,6 @@ trigger:
     include:
       - main
 
-# If you still have “No hosted parallelism…” use your self-hosted pool here:
 pool:
   vmImage: 'ubuntu-latest'
 
@@ -36,7 +35,7 @@ stages:
                 sudo apt-get install -y terraform
                 terraform -version
 
-          # Validate early to catch TF errors fast
+          # Validate early to catch TF errors
           - task: AzureCLI@2
             displayName: "Terraform validate"
             inputs:
@@ -62,7 +61,7 @@ stages:
                 terraform plan -out=tfplan -input=false
                 terraform apply -auto-approve tfplan
 
-          # Upload using storage ACCOUNT KEY (no RBAC needed)
+          # Upload using storage ACCOUNT KEY
           - task: AzureCLI@2
             displayName: "Upload static website files (account key)"
             inputs:

@@ -2,232 +2,484 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Savannah Fry | Cloud Infrastructure Engineer</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- security-ish headers -->
+  <meta http-equiv="X-Content-Type-Options" content="nosniff">
+  <meta http-equiv="X-Frame-Options" content="DENY">
+  <meta http-equiv="Referrer-Policy" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline';">
+
   <style>
-    /* ======== GLOBAL STYLES ======== */
-    body {
-      font-family: "Segoe UI", Roboto, Arial, sans-serif;
-      background-color: #f5f7fa;
-      color: #222;
-      line-height: 1.6;
-      margin: 0;
-      padding: 0;
+    :root {
+      --bg: #0f172a;
+      --bg2: #020617;
+      --panel: rgba(15, 23, 42, 0.6);
+      --fg: #e2e8f0;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent2: #6366f1;
+      --card: rgba(15, 23, 42, 0.9);
+      --radius: 1.25rem;
     }
-    header, section {
-      max-width: 1000px;
-      margin: 2rem auto;
-      padding: 1.5rem 2rem;
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.08);
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #0f172a 45%, #020617 90%);
+      min-height: 100vh;
+      color: var(--fg);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      background: rgba(2, 6, 23, 0.5);
+      backdrop-filter: blur(16px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+    }
+    .brand {
+      display: flex;
+      gap: .75rem;
+      align-items: center;
+    }
+    .logo {
+      width: 42px;
+      height: 42px;
+      border-radius: 1rem;
+      background: linear-gradient(135deg, #38bdf8, #6366f1);
+      display: grid;
+      place-items: center;
+      font-weight: 700;
+      font-size: .9rem;
+      box-shadow: 0 10px 25px rgba(56, 189, 248, 0.5);
+    }
+    .brand small {
+      color: var(--muted);
+      font-size: .7rem;
+    }
+    nav a {
+      color: var(--muted);
+      text-decoration: none;
+      margin-left: 1.25rem;
+      font-size: .85rem;
+    }
+    nav a.active, nav a:hover {
+      color: var(--fg);
+    }
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 3rem;
+      display: grid;
+      grid-template-columns: 1.2fr .8fr;
+      gap: 2rem;
+    }
+    .hero-box {
+      background: var(--panel);
+      border: 1px solid rgba(148, 163, 184, 0.1);
+      border-radius: 1.3rem;
+      padding: 1.6rem 1.5rem 1.2rem;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 25px 50px rgba(0, 0, 0, .35);
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, .5);
+      border-radius: 999px;
+      padding: .25rem .75rem;
+      font-size: .68rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      color: #e2e8f0;
+      margin-bottom: 1rem;
     }
     h1 {
-      font-size: 2.2rem;
-      text-align: center;
-      color: #2b3a67;
-      margin-bottom: 0.3rem;
+      font-size: clamp(2.1rem, 3vw, 2.5rem);
+      margin: 0 0 .6rem;
     }
-    h2 {
-      border-bottom: 2px solid #2b3a67;
-      padding-bottom: 0.3rem;
-      margin-top: 2.5rem;
-      color: #2b3a67;
-      font-size: 1.3rem;
+    .subtitle {
+      color: var(--muted);
+      margin-bottom: 1.25rem;
+      line-height: 1.5;
     }
-    h3 {
-      color: #333;
-      margin-top: 1.2rem;
-      font-size: 1.05rem;
+    .contact {
+      margin-bottom: 1rem;
     }
-    p, li {
-      font-size: 0.96rem;
-    }
-    ul {
-      padding-left: 1.3rem;
-    }
-    a {
-      color: #1a73e8;
+    .contact a {
+      color: var(--fg);
       text-decoration: none;
     }
-    a:hover {
-      text-decoration: underline;
+    .btn-row {
+      display: flex;
+      gap: .7rem;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
     }
-
-    /* ======== HEADER LINKS ======== */
-    .resume-links {
-      text-align: center;
-      margin-top: 0.8rem;
-    }
-    .resume-links a {
-      display: inline-block;
-      margin: 0.3rem 0.8rem;
-      padding: 0.6rem 1.2rem;
-      background: #2b3a67;
-      color: #fff;
-      border-radius: 5px;
-      font-size: 0.95rem;
-      transition: background 0.2s ease;
-    }
-    .resume-links a:hover {
-      background: #1e2755;
-    }
-
-    /* ======== PDF VIEWER ======== */
-    iframe {
-      width: 100%;
-      height: 950px;
+    .btn {
       border: none;
-      border-radius: 10px;
-      margin-top: 1.5rem;
+      background: var(--accent);
+      color: #020617;
+      padding: .55rem 1rem;
+      border-radius: .75rem;
+      font-weight: 600;
+      font-size: .8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      text-decoration: none;
+      box-shadow: 0 12px 25px rgba(56, 189, 248, .35);
+      cursor: pointer;
     }
-
-    /* ======== RESPONSIVE ======== */
-    @media (max-width: 768px) {
-      header, section {
-        padding: 1rem;
+    .btn.secondary {
+      background: rgba(15, 23, 42, 0.1);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      color: var(--fg);
+      box-shadow: none;
+    }
+    section {
+      margin-bottom: 1.5rem;
+    }
+    h2 {
+      font-size: 1rem;
+      margin-bottom: .5rem;
+    }
+    .panel {
+      background: var(--card);
+      border: 1px solid rgba(148, 163, 184, .1);
+      border-radius: 1rem;
+      padding: 1.1rem .95rem 1rem;
+      margin-bottom: 1rem;
+    }
+    .exp-item {
+      margin-bottom: 1rem;
+    }
+    .exp-title {
+      font-weight: 600;
+    }
+    .exp-meta {
+      color: var(--muted);
+      font-size: .75rem;
+      margin-bottom: .4rem;
+    }
+    ul {
+      padding-left: 1.2rem;
+    }
+    ul li {
+      margin-bottom: .25rem;
+      color: #cbd5f5;
+      font-size: .78rem;
+    }
+    .skills-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: .75rem;
+    }
+    .skill-card h3 {
+      font-size: .75rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .08em;
+      margin-bottom: .4rem;
+    }
+    .tag {
+      display: inline-block;
+      background: rgba(15, 23, 42, .35);
+      border: 1px solid rgba(148, 163, 184, .15);
+      border-radius: .6rem;
+      padding: .25rem .55rem;
+      font-size: .68rem;
+      margin: 0 .35rem .35rem 0;
+    }
+    .sidebar {
+      display: grid;
+      gap: 1rem;
+    }
+    .projects-list .proj {
+      margin-bottom: .7rem;
+    }
+    .projects-list .proj small {
+      color: var(--muted);
+    }
+    footer {
+      text-align: center;
+      padding: 1.25rem 1rem 2.5rem;
+      color: #475569;
+      font-size: .75rem;
+    }
+    /* Small enhancement to fit the PDF viewer in a panel */
+    .pdf-frame {
+      width: 100%;
+      height: 900px;
+      border: none;
+      border-radius: .8rem;
+      background: #0b1224;
+    }
+    @media (max-width: 970px) {
+      .container {
+        grid-template-columns: 1fr;
       }
-      h1 {
-        font-size: 1.8rem;
+      header {
+        flex-wrap: wrap;
       }
-      iframe {
-        height: 600px;
-      }
+      .pdf-frame { height: 600px; }
     }
   </style>
 </head>
 <body>
-
-  <!-- ======== HEADER ======== -->
   <header>
-    <h1>SAVANNAH FRY</h1>
-    <p style="text-align:center;">📧 <a href="mailto:savfry.dev@gmail.com">savfry.dev@gmail.com</a> • 📞 513-465-9932</p>
-
-    <div class="resume-links">
-      <a href="Savannah_Fry_Portfolio_Resume.pdf" target="_blank" rel="noopener">View PDF</a>
-      <a href="Savannah_Fry_Portfolio_Resume.pdf" download>Download PDF</a>
+    <div class="brand">
+      <div class="logo">SF</div>
+      <div>
+        <strong>Savannah Fry</strong><br />
+        <small>Cloud Infrastructure Engineer</small>
+      </div>
     </div>
+    <nav>
+      <a href="#about" class="active">About</a>
+      <a href="#experience">Experience</a>
+      <a href="#skills">Skills</a>
+      <a href="#certs">Certs</a>
+      <a href="#education">Education</a>
+      <a href="#resume">Resume</a>
+    </nav>
   </header>
 
-  <!-- ======== SUMMARY ======== -->
-  <section>
-    <h2>Professional Summary</h2>
-    <p>
-      Senior Cloud &amp; Infrastructure Engineer with 5+ years of experience designing, automating, and securing hybrid and cloud-native environments across Azure, AWS, VMware, and Nutanix. Certified Azure Administrator and Terraform Associate with deep expertise in Infrastructure as Code (Terraform, Ansible), automation, and virtualization. Proven track record building compliant, scalable infrastructures for healthcare and government workloads under NIST and HIPAA frameworks. Skilled in Azure Landing Zone design, cost optimization, RBAC &amp; Policy governance, and observability integration (Azure Monitor, Dynatrace, Datadog) to reduce MTTR by up to 40%. Known for cross-team collaboration, strong documentation, and adaptability in high-demand DevOps environments.
-    </p>
-  </section>
+  <div class="container">
+    <!-- main column -->
+    <div>
+      <div class="hero-box" id="about">
+        <span class="chip">Terraform • Azure • Azure DevOps • Ansible</span>
+        <h1>Savannah Fry</h1>
+        <p class="subtitle">
+          Senior Cloud &amp; Infrastructure Engineer with 5+ years of experience designing, automating, and securing hybrid and cloud-native environments across Azure, AWS, VMware, and Nutanix. Certified Azure Administrator and Terraform Associate with deep expertise in Infrastructure as Code (Terraform, Ansible), automation, and virtualization. Proven track record building compliant, scalable infrastructures for healthcare and government workloads under NIST and HIPAA frameworks. Skilled in Azure Landing Zone design, cost optimization, RBAC &amp; Policy governance, and observability integration (Azure Monitor, Dynatrace, Datadog) to reduce MTTR by up to 40%. Known for cross-team collaboration, strong documentation, and adaptability in high-demand environments.
+        </p>
+        <p class="contact">
+          <strong>Email:</strong> <a href="mailto:savfry.dev@gmail.com">savfry.dev@gmail.com</a><br />
+          <strong>Phone:</strong> <a href="tel:15134659932">513-465-9932</a>
+        </p>
+        <div class="btn-row">
+          <a class="btn" href="https://github.com/" target="_blank" rel="noreferrer">GitHub</a>
+          <a class="btn secondary" href="https://www.linkedin.com/" target="_blank" rel="noreferrer">LinkedIn</a>
+          <a class="btn secondary" href="Savannah_Fry_Portfolio_Resume.pdf" target="_blank" rel="noreferrer">View PDF</a>
+          <a class="btn secondary" href="Savannah_Fry_Portfolio_Resume.pdf" download rel="noreferrer">Download PDF</a>
+        </div>
+      </div>
 
-  <!-- ======== EXPERIENCE ======== -->
-  <section>
-    <h2>Professional Experience</h2>
+      <section id="experience">
+        <h2>Experience</h2>
 
-    <h3>Azure Cloud Engineer | Osceola County Clerk of Courts | December 2024 - September 2025</h3>
-    <ul>
-      <li>Administered and secured Azure GovCloud and Commercial environments supporting enterprise and public-sector workloads.</li>
-      <li>Expanded an existing Azure Landing Zone by introducing a Development and Production Spoke and enforcing tagging governance, RBAC least-privilege, and Azure Policy compliance baselines.</li>
-      <li>Architected and validated SQL Managed Instance + Blob/Azure Files architecture (~10 TB) using lifecycle tiering to balance cost and access performance.</li>
-      <li>Built VNets, NSGs, Private Endpoints, and Private DNS zones to enable private routing and hybrid connectivity via ExpressRoute.</li>
-      <li>Enhanced Terraform IaC automation within Azure DevOps pipelines, implementing plan → approval → apply workflows with centralized remote state.</li>
-      <li>Automated RBAC assignments, tagging governance, and Azure Policy compliance for consistent environment standards.</li>
-      <li>Configured Log Analytics and Azure Monitor workspaces to centralize SQL performance, VM telemetry, and network flow data.</li>
-      <li>Performed privileged-access audits to eliminate stale accounts and align security with least-privilege principles.</li>
-      <li>Streamlined workload migrations and system cutovers to Azure GovCloud and Commercial with zero downtime and complete observability integration.</li>
-    </ul>
+        <div class="panel">
+          <!-- Osceola -->
+          <div class="exp-item">
+            <div class="exp-title">Azure Cloud Engineer — Osceola County Clerk of Courts</div>
+            <div class="exp-meta">Dec 2024 – Sep 2025</div>
+            <ul>
+              <li>Administered and secured Azure GovCloud and Commercial environments supporting enterprise and public-sector workloads.</li>
+              <li>Expanded an Azure Landing Zone with Development &amp; Production spokes, enforcing tagging governance, RBAC least-privilege, and Azure Policy baselines.</li>
+              <li>Architected SQL Managed Instance + Blob/Azure Files (~10 TB) with lifecycle tiering for cost vs. access performance.</li>
+              <li>Built VNets, NSGs, Private Endpoints, and Private DNS for private routing and hybrid connectivity via ExpressRoute.</li>
+              <li>Enhanced Terraform automation in Azure DevOps (plan → approval → apply) using centralized remote state.</li>
+              <li>Automated RBAC assignments, tagging governance, and policy compliance for consistent standards.</li>
+              <li>Centralized telemetry with Log Analytics &amp; Azure Monitor (SQL performance, VM, and network flow data).</li>
+              <li>Performed privileged-access audits to remove stale accounts and align with least-privilege principles.</li>
+              <li>Executed zero-downtime migrations and cutovers to Azure with full observability integration.</li>
+            </ul>
+          </div>
 
-    <h3>Senior Infrastructure Design Engineer | BCBSNC | February 2022 - October 2024</h3>
-    <ul>
-      <li>Supported and optimized internal healthcare enterprise infrastructure, ensuring reliability, security, and high availability across hybrid Azure, AWS, VMware, and on-prem environments.</li>
-      <li>Designed and deployed Azure hub-and-spoke networks with ExpressRoute to enable secure hybrid identity, application connectivity, and centralized management.</li>
-      <li>Migrated VMware Horizon VDI to Azure Virtual Desktop (AVD), creating secure, HIPAA-compliant remote environments for internal operations and offshore teams.</li>
-      <li>Built and managed AWS EC2 and application servers to support development, testing, and compliance workloads.</li>
-      <li>Administered and maintained over 2,000 Windows and Linux servers, leveraging vSphere (6.7–8), Azure Monitor, Nagios, Zerto, and iDRAC for proactive monitoring and capacity management.</li>
-      <li>Implemented enterprise security standards through patch management, Group Policy, and SSL/TLS certificate renewals with PowerShell and AWS Certificate Manager.</li>
-      <li>Developed and maintained Ansible playbooks and roles for provisioning, configuration, and patching, reducing manual workload and improving consistency.</li>
-      <li>Automated AWS and Azure provisioning pipelines using Terraform and GitHub Actions, ensuring version-controlled, repeatable deployments.</li>
-      <li>Configured FSLogix profiles on Azure Files Premium with Private Endpoints and Private DNS, eliminating public exposure and improving login performance.</li>
-      <li>Enforced Azure Policy for tagging, diagnostics forwarding, and location restrictions alongside least-privilege RBAC.</li>
-      <li>Built Log Analytics and AVD Insights dashboards for proactive capacity and performance monitoring.</li>
-      <li>Acted as escalation point for Tier 1–4 incidents in ServiceNow, leading root-cause analysis and ensuring SLA compliance.</li>
-      <li>Partnered with infrastructure, network, and security teams to design and implement cost-efficient, compliant architectures aligned with HIPAA and NIST 800-171 standards.</li>
-      <li>Conducted technology assessments and presented recommendations to leadership for optimizing system performance, cloud cost management, and security posture.</li>
-    </ul>
+          <!-- BCBSNC -->
+          <div class="exp-item">
+            <div class="exp-title">Senior Infrastructure Design Engineer — BCBSNC</div>
+            <div class="exp-meta">Feb 2022 – Oct 2024</div>
+            <ul>
+              <li>Supported and optimized healthcare enterprise infrastructure across hybrid Azure, AWS, VMware, and on-prem environments.</li>
+              <li>Designed and deployed Azure hub-and-spoke networks with ExpressRoute for secure hybrid identity and centralized control.</li>
+              <li>Migrated VMware Horizon VDI to Azure Virtual Desktop (AVD) for HIPAA-compliant remote environments.</li>
+              <li>Built &amp; managed AWS EC2/app servers for dev, testing, and compliance workloads.</li>
+              <li>Administered 2,000+ Windows/Linux servers with vSphere (6.7–8), Azure Monitor, Nagios, Zerto, and iDRAC.</li>
+              <li>Implemented security via patching, GPO, and SSL/TLS renewals with PowerShell and AWS Certificate Manager.</li>
+              <li>Developed Ansible roles for provisioning, configuration, and patching to reduce manual work.</li>
+              <li>Automated AWS/Azure provisioning with Terraform &amp; GitHub Actions for repeatable deployments.</li>
+              <li>Configured FSLogix on Azure Files Premium with Private Endpoints and Private DNS to remove public exposure.</li>
+              <li>Enforced Azure Policy (tagging, diagnostics, allowed locations) and least-privilege RBAC.</li>
+              <li>Built Log Analytics &amp; AVD Insights dashboards for proactive capacity/performance monitoring.</li>
+              <li>Escalation point for Tier 1–4 incidents in ServiceNow, leading RCA and ensuring SLA compliance.</li>
+              <li>Partnered with infra/network/security to deliver cost-efficient, compliant architectures (HIPAA, NIST 800-171).</li>
+              <li>Presented technology assessments to improve performance, cloud cost management, and security posture.</li>
+            </ul>
+          </div>
 
-    <h3>Server Administrator | Gainwell Technologies | December 2019 - February 2022</h3>
-    <ul>
-      <li>Supported mission-critical government healthcare infrastructure, maintaining uptime, performance, and data integrity across hybrid on-prem and Azure environments.</li>
-      <li>Administered and maintained over 500 Windows and Linux servers, ensuring stability through proactive patching, configuration management, and system tuning.</li>
-      <li>Migrated SQL Server databases to Azure, implementing encryption at rest, role-based access controls, and automated backups to meet HIPAA, NIST 800-171, and CMS compliance standards.</li>
-      <li>Implemented Dynatrace APM for real-time application performance monitoring, creating custom dashboards for uptime, response times, and resource utilization.</li>
-      <li>Partnered with development and QA teams to identify and remediate application bottlenecks, reducing incident response time through alert optimization and proactive performance analysis.</li>
-      <li>Managed VMware vCenter (6.0–6.5) administration, F5 BIG-IP LTM load balancing, and SAN maintenance to support high-availability environments.</li>
-      <li>Conducted regular vulnerability assessments using Nessus and RSA Archer, applying remediations via Group Policy and Intune to maintain full regulatory compliance.</li>
-      <li>Led a large-scale Windows Server migration (2012 → 2019) with minimal downtime by coordinating change windows, validation testing, and stakeholder communication.</li>
-      <li>Documented environment baselines, change procedures, and incident resolutions in ServiceNow to strengthen knowledge continuity and audit readiness.</li>
-    </ul>
+          <!-- Gainwell -->
+          <div class="exp-item">
+            <div class="exp-title">Server Administrator — Gainwell Technologies</div>
+            <div class="exp-meta">Dec 2019 – Feb 2022</div>
+            <ul>
+              <li>Maintained uptime, performance, and data integrity across hybrid on-prem and Azure environments.</li>
+              <li>Administered 500+ Windows/Linux servers with proactive patching, configuration, and tuning.</li>
+              <li>Migrated SQL Server to Azure with encryption at rest, RBAC, and automated backups (HIPAA, NIST 800-171, CMS).</li>
+              <li>Deployed Dynatrace APM, building dashboards for uptime, response time, and resource utilization.</li>
+              <li>Partnered with dev/QA to remediate bottlenecks, reducing incident response time via alert optimization.</li>
+              <li>Managed vCenter (6.0–6.5), F5 BIG-IP LTM, and SAN for high-availability environments.</li>
+              <li>Performed vulnerability assessments with Nessus/Archer; remediated via GPO and Intune for compliance.</li>
+              <li>Led Windows Server 2012 → 2019 migration with minimal downtime through planned change windows.</li>
+              <li>Documented baselines, change procedures, and incident resolutions in ServiceNow.</li>
+            </ul>
+          </div>
 
-    <h3>End User Technology Specialist | TEKsystems | June 2019 - December 2019</h3>
-    <ul>
-      <li>Delivered enterprise-level technical support and system administration to ensure uptime, performance, and data security across cloud and on-prem environments.</li>
-      <li>Provided comprehensive technical support to end users, troubleshooting and resolving hardware, software, and network issues to minimize business disruption.</li>
-      <li>Administered Azure Virtual Desktop environments through Citrix Director, ensuring consistent performance, patch compliance, and secure remote access.</li>
-      <li>Managed Azure Active Directory accounts, permissions, and group policies, supporting identity lifecycle management across multiple departments.</li>
-      <li>Implemented and maintained security protocols and compliance controls, performing device audits and remediation through Microsoft 365 and Intune management tools.</li>
-      <li>Collaborated with internal IT and infrastructure teams to deploy system updates, support migrations, and improve reliability of enterprise applications.</li>
-      <li>Documented technical procedures, troubleshooting steps, and configurations to enhance service continuity and streamline support operations.</li>
-    </ul>
+          <!-- TEKsystems (End User Tech Specialist) -->
+          <div class="exp-item">
+            <div class="exp-title">End User Technology Specialist — TEKsystems</div>
+            <div class="exp-meta">Jun 2019 – Dec 2019</div>
+            <ul>
+              <li>Delivered enterprise support and system administration to ensure uptime, performance, and data security.</li>
+              <li>Troubleshot hardware, software, and network issues to minimize business disruption.</li>
+              <li>Administered AVD via Citrix Director for performance, patch compliance, and secure access.</li>
+              <li>Managed Azure AD accounts, permissions, and group policies across departments.</li>
+              <li>Implemented security protocols and device compliance via Microsoft 365 and Intune.</li>
+              <li>Supported updates, migrations, and reliability improvements with cross-functional teams.</li>
+              <li>Documented procedures and configurations to improve service continuity.</li>
+            </ul>
+          </div>
 
-    <h3>Apple Master | Geek Squad | February 2018 - February 2020</h3>
-    <ul>
-      <li>Diagnosed, repaired, and maintained Apple hardware/software ecosystems, sustaining 100% client satisfaction.</li>
-      <li>Served as liaison between Geek Squad and Apple Corporate ensuring SLA compliance and quality assurance.</li>
-      <li>Delivered clear client communication and best practices for device performance, data integrity, and lifecycle maintenance.</li>
-    </ul>
-  </section>
+          <!-- Apple Master -->
+          <div class="exp-item">
+            <div class="exp-title">Apple Master — Geek Squad</div>
+            <div class="exp-meta">Feb 2018 – Feb 2020</div>
+            <ul>
+              <li>Diagnosed and repaired Apple hardware/software with 100% client satisfaction.</li>
+              <li>Liaised with Apple Corporate to ensure SLA compliance and quality assurance.</li>
+              <li>Delivered clear guidance on device performance, data integrity, and lifecycle best practices.</li>
+            </ul>
+          </div>
+        </div>
+      </section>
 
-  <!-- ======== CERTIFICATIONS ======== -->
-  <section>
-    <h2>Certifications</h2>
-    <ul>
-      <li>Microsoft Certified: Azure Administrator Associate — Credential ID: 756BDB1E30C</li>
-      <li>Microsoft Certified: Azure Fundamentals — Credential ID: 990234269</li>
-      <li>HashiCorp Certified: Terraform Associate (003) — View Credential</li>
-      <li>Management &amp; Organizational Behavior — Sinclair Community College</li>
-      <li>Supervisory Skills — Sinclair Community College</li>
-    </ul>
-  </section>
+      <!-- Inline PDF Viewer -->
+      <section id="resume">
+        <h2>Full Resume (PDF Viewer)</h2>
+        <div class="panel">
+          <iframe class="pdf-frame" src="Savannah_Fry_Portfolio_Resume.pdf" title="Savannah Fry Resume PDF"></iframe>
+        </div>
+      </section>
+    </div>
 
-  <!-- ======== EDUCATION ======== -->
-  <section>
-    <h2>Education</h2>
-    <ul>
-      <li><strong>Master of Science in Engineering Technology Management</strong> — Western Kentucky University | Anticipated Completion: December 2026</li>
-      <li><strong>Bachelor of Science in Computer Information Technology</strong> — Western Kentucky University | Completed: May 2022</li>
-      <li><strong>Associate of Science in Computer Information Technology</strong> — Columbia State Community College | Completed: May 2022</li>
-      <li><strong>Associate of Applied Science in Business Management: Entrepreneurship</strong> — Sinclair Community College | Completed: May 2016</li>
-    </ul>
-  </section>
+    <!-- sidebar -->
+    <aside class="sidebar">
+      <!-- Skills -->
+      <div class="panel" id="skills">
+        <h2>Skills</h2>
+        <div class="skills-grid">
+          <div class="skill-card">
+            <h3>Cloud &amp; Virtualization</h3>
+            <span class="tag">Azure (AVD, Monitor, Log Analytics, RBAC, ExpressRoute, Azure Files, FSLogix)</span>
+            <span class="tag">AWS (EC2, IAM, S3, ACM)</span>
+            <span class="tag">VMware vSphere 6.5–8 / Horizon</span>
+            <span class="tag">Nutanix AHV/Prism</span>
+          </div>
+          <div class="skill-card">
+            <h3>Infrastructure &amp; Automation</h3>
+            <span class="tag">Terraform</span>
+            <span class="tag">Ansible</span>
+            <span class="tag">PowerShell</span>
+            <span class="tag">Python</span>
+            <span class="tag">Azure DevOps</span>
+            <span class="tag">GitHub / Jenkins</span>
+            <span class="tag">CloudFormation</span>
+            <span class="tag">CI/CD • IaC</span>
+          </div>
+          <div class="skill-card">
+            <h3>Backup • Monitoring • Security</h3>
+            <span class="tag">Rubrik</span>
+            <span class="tag">Zerto</span>
+            <span class="tag">Cohesity</span>
+            <span class="tag">Dynatrace</span>
+            <span class="tag">SiteScope</span>
+            <span class="tag">Nagios</span>
+            <span class="tag">BeyondTrust PRA</span>
+            <span class="tag">Archer</span>
+            <span class="tag">Intune • MEM • PIM</span>
+          </div>
+          <div class="skill-card">
+            <h3>OS &amp; Tooling</h3>
+            <span class="tag">Windows Server 2008 R2–2022</span>
+            <span class="tag">Rocky • Ubuntu • RHEL</span>
+            <span class="tag">VS Code</span>
+            <span class="tag">ServiceNow</span>
+            <span class="tag">Power BI</span>
+            <span class="tag">SQL Server • SCCM • WSUS</span>
+            <span class="tag">Certero • Salesforce</span>
+            <span class="tag">Notepad++</span>
+          </div>
+          <div class="skill-card">
+            <h3>Versioning &amp; Collab</h3>
+            <span class="tag">GitHub</span>
+            <span class="tag">Azure DevOps Repos</span>
+            <span class="tag">SharePoint</span>
+            <span class="tag">Confluence</span>
+            <span class="tag">Microsoft 365 (Word/Excel/PowerPoint/Visio/OneNote/Outlook)</span>
+          </div>
+          <div class="skill-card">
+            <h3>Soft Skills</h3>
+            <span class="tag">Analytical Problem-Solving</span>
+            <span class="tag">Collaboration</span>
+            <span class="tag">Documentation</span>
+            <span class="tag">Adaptability</span>
+            <span class="tag">Communication</span>
+            <span class="tag">Continuous Learning</span>
+          </div>
+        </div>
+      </div>
 
-  <!-- ======== SKILLS ======== -->
-  <section>
-    <h2>Skills</h2>
-    <ul>
-      <li><strong>Cloud &amp; Virtualization:</strong> Microsoft Azure (AVD, Monitor, Log Analytics, RBAC, ExpressRoute, Azure Files, FSLogix), AWS (EC2, IAM, S3, Certificate Manager), VMware vSphere 6.5–8, VMware Horizon, Nutanix AHV/Prism</li>
-      <li><strong>Infrastructure &amp; Automation:</strong> Terraform, Ansible, PowerShell, Python, GitHub, Azure DevOps, Jenkins, CloudFormation, CI/CD Pipelines, Infrastructure as Code (IaC)</li>
-      <li><strong>Backup, Monitoring &amp; Security:</strong> Rubrik, Zerto, Cohesity, Dynatrace, SiteScope, Nagios, BeyondTrust PRA, Archer, Intune, Microsoft Endpoint Manager, Privileged Identity Management (PIM)</li>
-      <li><strong>Operating Systems:</strong> Windows Server (2008 R2–2022), Linux (Rocky, Ubuntu, RHEL)</li>
-      <li><strong>Networking &amp; Datacenter:</strong> F5 BIG-IP LTM, HPE Synergy Frame, HPE 3PAR StoreServ, HPE ProLiant Gen8–10, Cisco/Brocade Switches, iLO, OneView</li>
-      <li><strong>Software &amp; Tooling:</strong> Visual Studio Code, ServiceNow, Power BI, Citrix Director, SQL Server, SCCM, WSUS, Certero, Salesforce, Notepad++</li>
-      <li><strong>Version Control &amp; Collaboration:</strong> GitHub, Azure DevOps Repos, SharePoint, Confluence, Microsoft 365 Suite (Word, Excel, PowerPoint, Visio, OneNote, Outlook)</li>
-      <li><strong>Coding &amp; Scripting:</strong> PowerShell, Python, HTML, CSS3</li>
-      <li><strong>Soft Skills:</strong> Analytical Problem-Solving, Collaboration, Documentation, Adaptability, Communication, Continuous Learning</li>
-    </ul>
-  </section>
+      <!-- Certifications -->
+      <div class="panel" id="certs">
+        <h2>Certifications</h2>
+        <ul>
+          <li>Microsoft Certified: Azure Administrator Associate — Credential ID: 756BDB1E30C</li>
+          <li>Microsoft Certified: Azure Fundamentals — Credential ID: 990234269</li>
+          <li>HashiCorp Certified: Terraform Associate (003) — View Credential</li>
+          <li>Management &amp; Organizational Behavior — Sinclair Community College</li>
+          <li>Supervisory Skills — Sinclair Community College</li>
+        </ul>
+      </div>
 
-  <!-- ======== INLINE RESUME VIEWER ======== -->
-  <section>
-    <h2>Full Resume (PDF Viewer)</h2>
-    <iframe src="Savannah_Fry_Portfolio_Resume.pdf"></iframe>
-  </section>
+      <!-- Education -->
+      <div class="panel" id="education">
+        <h2>Education</h2>
+        <p class="subtitle" style="margin-bottom:.5rem;">
+          <strong>M.S. Engineering Technology Management</strong> — Western Kentucky University (Anticipated Dec 2026)
+        </p>
+        <p class="subtitle" style="margin-bottom:.5rem;">
+          <strong>B.S. Computer Information Technology</strong> — Western Kentucky University (May 2022)
+        </p>
+        <p class="subtitle" style="margin-bottom:.5rem;">
+          <strong>A.S. Computer Information Technology</strong> — Columbia State Community College (May 2022)
+        </p>
+        <p class="subtitle">
+          <strong>A.A.S. Business Management (Entrepreneurship)</strong> — Sinclair Community College (2016)
+        </p>
+      </div>
 
+      <!-- Contact -->
+      <div class="panel">
+        <h2>Contact</h2>
+        <p class="subtitle">
+          Email: <a href="mailto:savfry.dev@gmail.com" style="color:var(--fg);">savfry.dev@gmail.com</a><br />
+          Phone: <a href="tel:15134659932" style="color:var(--fg);">513-465-9932</a>
+        </p>
+      </div>
+    </aside>
+  </div>
+
+  <footer>
+    Built by Savannah Fry • Terraform &amp; Azure DevOps • Static site on Azure Storage
+  </footer>
 </body>
 </html>
