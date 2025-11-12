@@ -1,57 +1,83 @@
 trigger:
   branches:
-    include: [ main ]
+    include:
+      - main
 
 pool:
   vmImage: 'ubuntu-latest'
 
-steps:
-- checkout: self
+variables:
+  AZURE_SERVICE_CONNECTION: 'sc-azure-portfolio'  # <-- your service connection name
+  TF_WORKING_DIR: 'infra'
+  WEBSITE_DIR: 'website'
 
-- task: AzureCLI@2
-  displayName: "Upload static website files (account key)"
-  inputs:
-    azureSubscription: $(AZURE_SERVICE_CONNECTION)
-    scriptType: bash
-    scriptLocation: inlineScript
-    inlineScript: |
-      set -euo pipefail
+stages:
+  - stage: terraform
+    displayName: "Terraform Deploy"
+    jobs:
+      - job: terraform
+        displayName: "Run Terraform"
+        steps:
+          - checkout: self
 
-      # Resolve from Terraform
-      SA_NAME=$(terraform -chdir="$(TF_WORKING_DIR)" output -raw storage_account_name)
-      RG_NAME=$(terraform -chdir="$(TF_WORKING_DIR)" output -raw resource_group_name)
+          # Install Terraform
+          - task: Bash@3
+            displayName: "Install Terraform"
+            inputs:
+              targetType: inline
+              script: |
+                set -e
+                sudo apt-get update -y
+                sudo apt-get install -y gnupg software-properties-common curl unzip
+                curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
+                echo "deb [signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
+                sudo apt-get update -y
+                sudo apt-get install -y terraform
+                terraform -version
 
-      echo "Storage account: $SA_NAME (RG: $RG_NAME)"
-      if [ -z "$SA_NAME" ] || [ -z "$RG_NAME" ]; then
-        echo "ERROR: TF outputs missing"; exit 2
-      fi
+          # Validate early to catch TF errors
+          - task: AzureCLI@2
+            displayName: "Terraform validate"
+            inputs:
+              azureSubscription: $(AZURE_SERVICE_CONNECTION)
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: $(TF_WORKING_DIR)
+              inlineScript: |
+                set -e
+                terraform init -upgrade -input=false
+                terraform validate
 
-      # Need 'Storage Account Key Operator Service Role' (or Contributor) for this:
-      set +x
-      KEY=$(az storage account keys list -n "$SA_NAME" -g "$RG_NAME" --query "[0].value" -o tsv)
-      set -x
-      if [ -z "$KEY" ]; then echo "ERROR: could not retrieve key"; exit 3; fi
+          # Plan & Apply
+          - task: AzureCLI@2
+            displayName: "Terraform plan/apply"
+            inputs:
+              azureSubscription: $(AZURE_SERVICE_CONNECTION)
+              scriptType: bash
+              scriptLocation: inlineScript
+              workingDirectory: $(TF_WORKING_DIR)
+              inlineScript: |
+                set -e
+                terraform plan -out=tfplan -input=false
+                terraform apply -auto-approve tfplan
 
-      # Enable static site
-      az storage blob service-properties update \
-        --account-name "$SA_NAME" \
-        --static-website \
-        --index-document index.html \
-        --404-document 404.html \
-        --account-key "$KEY" \
-        --only-show-errors
+          # Upload using storage ACCOUNT KEY
+          - task: AzureCLI@2
+            displayName: "Upload static website files (account key)"
+            inputs:
+              azureSubscription: $(AZURE_SERVICE_CONNECTION)
+              scriptType: bash
+              scriptLocation: inlineScript
+              inlineScript: |
+                set -e
+                SA_NAME=$(terraform -chdir=$(TF_WORKING_DIR) output -raw storage_account_name)
+                RG_NAME=$(terraform -chdir=$(TF_WORKING_DIR) output -raw resource_group_name)
 
-      # Upload
-      SRC="$(Build.SourcesDirectory)/$(WEBSITE_DIR)"
-      echo "Uploading from: $SRC"
-      if [ ! -d "$SRC" ]; then echo "ERROR: Source not found: $SRC"; exit 4; fi
+                echo "Resolving key for storage account: $SA_NAME (RG: $RG_NAME)"
+                KEY=$(az storage account keys list -n "$SA_NAME" -g "$RG_NAME" --query "[0].value" -o tsv)
 
-      az storage blob upload-batch \
-        --account-name "$SA_NAME" \
-        --account-key "$KEY" \
-        --destination '$web' \
-        --source "$SRC" \
-        --overwrite \
-        --only-show-errors
-
-      echo "Upload complete"
+                az storage blob upload-batch \
+                  --account-name "$SA_NAME" \
+                  --account-key "$KEY" \
+                  --destination '$web' \
+                  --source $(WEBSITE_DIR)
