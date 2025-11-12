@@ -6,14 +6,28 @@ trigger:
 pool:
   vmImage: 'ubuntu-latest'
 
-variables:
-  # set these in the pipeline UI or variable group (non-secret is fine)
-  SITE_FOLDER: '.'
-  STORAGE_ACCOUNT_NAME: 'yourstorageacct'
-
 steps:
+# 1. Checkout repository
 - checkout: self
 
+# 2. Validate storage account
+- task: AzureCLI@2
+  displayName: 'Validate storage account'
+  inputs:
+    azureSubscription: 'sc-azure-portfolio'
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      set -euo pipefail
+      echo "Current subscription:"
+      az account show --query "{name:name, id:id}" -o tsv
+      echo "Checking storage account: $(STORAGE_ACCOUNT_NAME)"
+      az storage account show \
+        --name "$(STORAGE_ACCOUNT_NAME)" \
+        --query "{name:name, resourceGroup:resourceGroup, kind:kind, publicNetworkAccess:publicNetworkAccess}" \
+        -o table
+
+# 3. Enable static website and upload content
 - task: AzureCLI@2
   displayName: 'Upload static website to $web (RBAC, no keys)'
   inputs:
@@ -22,7 +36,6 @@ steps:
     scriptLocation: inlineScript
     inlineScript: |
       set -euo pipefail
-
       SRC="$(Build.SourcesDirectory)/$(SITE_FOLDER)"
       echo "Using source path: $SRC"
       if [ ! -d "$SRC" ]; then
@@ -31,7 +44,7 @@ steps:
         exit 2
       fi
 
-      echo "Ensuring static website is enabled (idempotent)..."
+      echo "Enabling static website (idempotent)..."
       az storage blob service-properties update \
         --account-name "$(STORAGE_ACCOUNT_NAME)" \
         --static-website \
@@ -48,3 +61,5 @@ steps:
         --overwrite \
         --auth-mode login \
         --only-show-errors
+
+      echo "Upload complete!"
