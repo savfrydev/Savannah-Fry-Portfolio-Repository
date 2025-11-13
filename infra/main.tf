@@ -84,9 +84,6 @@ resource "azurerm_cdn_frontdoor_origin" "static" {
   http_port                      = 80
   https_port                     = 443
 
-  enabled               = true
-  health_probes_enabled = true
-
   priority = 1
   weight   = 1
 }
