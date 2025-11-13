@@ -1,48 +1,36 @@
 trigger:
   branches:
-    include:
-      - main
+    include: [ main ]
 
 pool:
   vmImage: 'ubuntu-latest'
 
 steps:
-# 1. Checkout repository
 - checkout: self
 
-# 2. Validate storage account
 - task: AzureCLI@2
-  displayName: 'Validate storage account'
+  displayName: "Sanity: show subscription and storage account"
   inputs:
-    azureSubscription: 'sc-azure-portfolio'
+    azureSubscription: $(AZURE_SERVICE_CONNECTION)
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
       set -euo pipefail
-      echo "Current subscription:"
-      az account show --query "{name:name, id:id}" -o tsv
-      echo "Checking storage account: $(STORAGE_ACCOUNT_NAME)"
-      az storage account show \
-        --name "$(STORAGE_ACCOUNT_NAME)" \
-        --query "{name:name, resourceGroup:resourceGroup, kind:kind, publicNetworkAccess:publicNetworkAccess}" \
-        -o table
+      az account show --query "{name:name,id:id,tenant:tenantId,user:user}" -o table
+      echo "STORAGE_ACCOUNT_NAME=$(STORAGE_ACCOUNT_NAME)"
+      az storage account show -n "$(STORAGE_ACCOUNT_NAME)" --query "{name:name,kind:kind,isHnsEnabled:isHnsEnabled,publicNetworkAccess:publicNetworkAccess}" -o table
 
-# 3. Enable static website and upload content
+# enable static website + upload using RBAC (no keys)
 - task: AzureCLI@2
-  displayName: 'Upload static website to $web (RBAC, no keys)'
+  displayName: "Upload static website to $web (RBAC, no keys)"
   inputs:
-    azureSubscription: 'sc-azure-portfolio'
+    azureSubscription: $(AZURE_SERVICE_CONNECTION)
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
       set -euo pipefail
       SRC="$(Build.SourcesDirectory)/$(SITE_FOLDER)"
-      echo "Using source path: $SRC"
-      if [ ! -d "$SRC" ]; then
-        echo "ERROR: Source not found: $SRC"
-        echo "Tip: set SITE_FOLDER='.' if files are at repo root."
-        exit 2
-      fi
+      test -d "$SRC" || { echo "ERROR: Source not found: $SRC"; exit 2; }
 
       echo "Enabling static website (idempotent)..."
       az storage blob service-properties update \
@@ -53,7 +41,7 @@ steps:
         --auth-mode login \
         --only-show-errors || true
 
-      echo "Uploading from $SRC → \$web..."
+      echo "Uploading from $SRC -> \$web ..."
       az storage blob upload-batch \
         --account-name "$(STORAGE_ACCOUNT_NAME)" \
         --destination '$web' \
@@ -62,4 +50,4 @@ steps:
         --auth-mode login \
         --only-show-errors
 
-      echo "Upload complete!"
+      echo "Upload complete"
