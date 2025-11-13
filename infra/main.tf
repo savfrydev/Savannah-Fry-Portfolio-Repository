@@ -77,16 +77,20 @@ resource "azurerm_cdn_frontdoor_origin" "static" {
   name                          = "storage-web"
   cdn_frontdoor_origin_group_id = azurerm_cdn_frontdoor_origin_group.default.id
 
-  host_name                     = azurerm_storage_account.sa.primary_web_host
-  origin_host_header            = azurerm_storage_account.sa.primary_web_host
+  host_name          = azurerm_storage_account.sa.primary_web_host
+  origin_host_header = azurerm_storage_account.sa.primary_web_host
 
   certificate_name_check_enabled = false
   http_port                      = 80
   https_port                     = 443
 
+  enabled               = true
+  health_probes_enabled = true
+
   priority = 1
   weight   = 1
 }
+
 
 ########################################
 # Azure Front Door Route
