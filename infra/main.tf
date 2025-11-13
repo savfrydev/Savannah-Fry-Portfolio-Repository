@@ -104,17 +104,21 @@ resource "azurerm_cdn_frontdoor_route" "default" {
     azurerm_cdn_frontdoor_origin.static.id
   ]
 
-  # Add custom domain here:
-  cdn_frontdoor_custom_domain_ids = [
-    azurerm_cdn_frontdoor_custom_domain.portfolio_domain.id
-  ]
-
   patterns_to_match      = ["/*"]
   supported_protocols    = ["Http", "Https"]
   forwarding_protocol    = "HttpsOnly"
   https_redirect_enabled = true
 
   link_to_default_domain = false
+
+  cdn_frontdoor_custom_domain_ids = [
+    azurerm_cdn_frontdoor_custom_domain.portfolio_domain.id
+  ]
+
+  depends_on = [
+    azurerm_cdn_frontdoor_origin_group.default,
+    azurerm_cdn_frontdoor_origin.static
+  ]
 }
 
 
